@@ -1,0 +1,62 @@
+---
+- name: Generate and Install Configuration File
+  hosts:
+    - all
+  roles:
+    - Juniper.junos
+  connection: local
+  gather_facts: no
+  
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+    #tmp_dir: "tmp"
+    #conf_file: "{{ tmp_dir}}/{{ inventory_hostname }}.conf"
+    #netmask: "26"
+    username: root
+    terminal_server: 172.31.4.10
+    term_ser_port: 2068
+
+  tasks:
+   # - name: confirm or create configs directory
+    #  file:
+     #   path: "{{ tmp_dir }}"
+      #  state: directory
+      #run_once: yes
+
+   #- name: save device information using template
+    # template
+     #  src: template/initial-ex-vlan.j2
+      # dest: "{{ conf_file }}"
+   
+   #- name: install generated configuration file onto device
+    # juniper_junos_config:
+     #  provider:
+      #   host: "{{ terminal_server }}"
+       #  mode: telnet
+      #   port: "{{ term_ser_port }}"
+       #  user: "{{ username }}"
+       #  timeout: 120
+      #src: "{{ conf_file }}"
+       #load: set
+       #lines:
+        # - set system host-name PE13-MSK-Rumancevo-8F
+       #comment: "set host name from ansible"
+      
+    - name: get serial number
+      juniper_junos_command:
+        command:
+          - show chassis hardware models
+        formats: xml
+        provider:
+          host: "{{ terminal_server }}"
+          mode: telnet
+          port: "{{ term_ser_port }}"
+          user: "{{ username }}"
+          timeout: 120
+      register: hardware_info
+      
+      
+#  - name: delete generated configuration file
+       #file:
+         #path: "{{ conf_file }}"
+         #state: absent

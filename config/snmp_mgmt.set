@@ -1,0 +1,1 @@
+set snmp community kjoHufgv334e90 authorization read-only routing-instance MGMT

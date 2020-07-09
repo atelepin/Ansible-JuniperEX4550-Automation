@@ -1,0 +1,44 @@
+system {
+    host-name {{ inventory_hostname }};
+    time-zone Europe/Moscow;
+    root-authentication {
+    encrypted-password "$1$XKJP38km$vJXrzuKZKW1NzPrJsHJmp1"; ## SECRET-DATA
+    }
+
+
+    services {
+        ssh;
+        netconf {
+            ssh;
+        }
+    }
+}
+
+interfaces {
+    interface-range aja2 {
+        member ge-0/1/0;
+        member ge-0/1/1;
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members aja2;
+                }
+            }
+        }
+    }
+    
+    vlan {
+        unit 0 {
+            family inet {
+                address {{ ansible_host }}/{{ netmask }};
+            }
+        }
+    }
+}
+
+vlans {
+    aja2 {
+        l3-interface vlan.0;
+    }
+}

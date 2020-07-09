@@ -1,0 +1,49 @@
+---
+- name: Get device uptime
+  hosts:
+    - all
+    
+  roles:
+    - Juniper.junos
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+    username: root
+    password: MoSline234
+    connection_settings:
+      host: "{{ ansible_host }}"
+      port: 22
+      user: "{{ username }}"
+      passwd: "{{ password }}"
+      timeout: 120
+  connection: local
+  gather_facts: no
+        
+  tasks:      
+    - name: get serial number
+      juniper_junos_command:
+        command:
+            - show chassis hardware models
+        formats: xml
+        provider: "{{ connection_settings }}"
+      register: hardware_info
+
+    - name: display hardware_info
+      debug:
+        msg: "{{ hardware_info }}"
+      
+    - name: query serial number information
+      xml:
+        xmlstring: "{{ hardware_info.stdout }}"
+        xpath: //chassis-module[*] #[name='Routing Engine*']
+            #- //serial-number
+            #  //name
+        content: text
+        #content: attribute
+      register: serial_number
+      
+    #display serial numbers
+    - name: display serial number
+      debug:
+        msg: "{{ serial_number.matches }}"
+
+ 

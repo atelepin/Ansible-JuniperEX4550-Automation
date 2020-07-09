@@ -1,0 +1,21 @@
+set protocols rsvp interface ae0.0
+set protocols rsvp interface lo0.0
+set protocols mpls interface ae0.0
+set protocols mpls interface lo0.0
+set protocols bgp group ibgp type internal
+set protocols bgp group ibgp local-address  {{ MPLS_Loopback_IP }}
+set protocols bgp group ibgp family inet-vpn unicast
+set protocols bgp group ibgp family l2vpn signaling
+set protocols bgp group ibgp neighbor {{ MPBGP_Peer }}
+set protocols ospf traffic-engineering
+set protocols ospf export into-ospf
+set protocols ospf area {{ MPLS_OSPF_AREA }} stub
+set protocols ospf area {{ MPLS_OSPF_AREA }} interface ae0.0
+set protocols ospf area {{ MPLS_OSPF_AREA }} interface lo0.0 passive
+set protocols ldp interface ae0.0
+set protocols ldp interface lo0.0
+set protocols igmp-snooping vlan all
+set protocols dcbx interface all
+set protocols rstp
+set protocols lldp interface all
+set protocols lldp-med interface all

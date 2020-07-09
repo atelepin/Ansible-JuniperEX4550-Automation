@@ -1,0 +1,33 @@
+delete interfaces
+set interfaces xe-0/0/0 description {{ PExx_Msk_Destination }}
+set interfaces xe-0/0/0 ether-options 802.3ad ae0
+set interfaces ge-0/0/28 description "MGMT access port"
+set interfaces ge-0/0/28 unit 0 family ethernet-switching port-mode access
+set interfaces ge-0/0/28 unit 0 family ethernet-switching vlan members MGMT
+set interfaces ge-0/0/29 description "Internet access port"
+set interfaces ge-0/0/29 unit 0 family ethernet-switching port-mode access
+set interfaces ge-0/0/29 unit 0 family ethernet-switching vlan members Internet
+set interfaces xe-0/0/30 description "L2 Loop"
+set interfaces xe-0/0/30 mtu 9192
+set interfaces xe-0/0/30 unit 0 family ethernet-switching port-mode trunk
+set interfaces xe-0/0/30 unit 0 family ethernet-switching vlan members all
+set interfaces xe-0/0/31 description "L3 Loop"
+set interfaces xe-0/0/31 vlan-tagging
+set interfaces xe-0/0/31 mtu 9192
+set interfaces xe-0/0/31 encapsulation vlan-ccc
+set interfaces ae0 description {{ PExx_Msk_Destination }}
+set interfaces ae0 mtu 9216
+set interfaces ae0 unit 0 family inet address {{ P2P_Address_1 }}
+set interfaces ae0 unit 0 family mpls
+set interfaces lo0 unit 0 description MPLS-Backbone
+set interfaces lo0 unit 0 family inet address {{ MPLS_Loopback_IP }}
+set interfaces lo0 unit 1 description MGMT
+set interfaces lo0 unit 1 family inet address {{ MGMT_Loopback_IP }}
+set interfaces lo0 unit 10 description Internet
+set interfaces lo0 unit 10 family inet address {{ Internet_Loopback_IP }}
+set interfaces vlan unit 0 family inet dhcp vendor-id Juniper-ex4550-32f
+set interfaces vlan unit 20 description MGMT_Network_{{ Location }}
+set interfaces vlan unit 20 family inet address {{ MGMT_Network }}
+set interfaces vlan unit 50 description Internet_Network_{{ Location }}
+set interfaces vlan unit 50 family inet address {{ Internet_Network }}
+set interfaces vme unit 0 family inet dhcp vendor-id Juniper-ex4550-32f

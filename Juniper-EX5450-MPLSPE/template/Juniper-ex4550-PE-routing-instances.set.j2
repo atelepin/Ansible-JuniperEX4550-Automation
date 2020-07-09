@@ -1,0 +1,15 @@
+set routing-instances Internet description Internet
+set routing-instances Internet instance-type vrf
+set routing-instances Internet interface lo0.10
+set routing-instances Internet interface vlan.50
+set routing-instances Internet route-distinguisher 31370:10
+set routing-instances Internet vrf-target target:31370:10
+set routing-instances Internet vrf-table-label
+set routing-instances MGMT description "Mosline MGMT Networks"
+set routing-instances MGMT instance-type vrf
+set routing-instances MGMT interface lo0.1
+set routing-instances MGMT interface vlan.20
+set routing-instances MGMT route-distinguisher 31370:1
+set routing-instances MGMT vrf-target target:31370:1
+set routing-instances MGMT vrf-table-label
+

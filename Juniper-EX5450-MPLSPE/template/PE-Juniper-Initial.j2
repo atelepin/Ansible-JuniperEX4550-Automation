@@ -1,0 +1,247 @@
+system {
+    host-name {{ inventory_hostname }};
+    time-zone Europe/Moscow;
+    root-authentication {
+        encrypted-password "$1$XKJP38km$vJXrzuKZKW1NzPrJsHJmp1"; ## SECRET-DATA
+    }
+    login {
+        user admin {
+            uid 2004;
+            class super-user;
+            authentication {
+                encrypted-password "$1$zzeM/kdJ$uQCymArL6Mv9O4R/YIXgh/"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            client-alive-count-max 100;
+            client-alive-interval 3600;
+            connection-limit 10;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+}
+
+interfaces {
+    ae0 {
+        description {{ PExx_Msk_Destination }};
+        mtu 9216;
+        unit 0 {
+            family inet {
+                address {{ P2P_Address_1 }};
+            }
+            family mpls;
+        }
+    }
+    
+    xe-0/0/0 {
+        description {{ PExx_Msk_Destination }};
+            ether-options {
+            802.3ad ae0;
+        }
+    }
+  
+    ge-0/0/28 {
+        description "MGMT access port"
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members MGMT;
+                }
+            }
+        }
+    }
+    
+    ge-0/0/29 {
+        description "Internet access port" 
+        unit 0 {
+            family ethernet-switching {
+                port-mode access;
+                vlan {
+                    members Internet;
+                }
+            }
+        }
+    }
+    
+    xe-0/0/30 {
+        description "L2 Loop"
+        mtu 9192;
+        unit 0 {
+            family ethernet-switching {
+                port-mode trunk;
+                vlan {
+                    members all;
+                }
+            }
+        }
+    }
+    
+    xe-0/0/31 {
+        description "L3 Loop"
+        vlan-tagging;
+        mtu 9192;
+        encapsulation vlan-ccc;
+
+}
+
+ 
+    lo0 {
+        unit 0 {
+            description MPLS-Backbone;
+            family inet {
+                address {{ MPLS_Loopback_IP }};
+            }
+        }
+        unit 1 {
+            description MGMT
+            family inet {
+                address {{ MGMT_Loopback_IP }};
+            }
+        }
+        unit 10 {
+            description Internet
+            family inet {
+                address {{ Internet_Loopback_IP }};
+            }
+        }
+    }
+    vlan {
+        unit 0 {
+            family inet {
+                dhcp {
+                    vendor-id Juniper-ex4550-32f;
+                }
+            }
+        }
+        unit 20 {
+            description  MGMT_Network_{{ Location }};
+            family inet {
+                address {{ MGMT_Network }};
+            }
+        }
+    }
+    vme {
+        unit 0 {
+            family inet {
+                dhcp {
+                    vendor-id Juniper-ex4550-32f;
+                }
+            }
+        }
+    }
+}
+snmp {
+    community {{ SMNP_RO_Community }} {
+        authorization read-only;
+        routing-instance Internet {
+            clients {
+                0.0.0.0/0;
+            }
+        }
+        routing-instance MGMT;
+    }
+    community {{ SMNP_RW_Community }} {
+        authorization read-write;
+        routing-instance Internet;
+        routing-instance MGMT;
+    }
+    routing-instance-access;
+}
+routing-options {
+    router-id {{ MPLS_Loopback_IP }};
+    autonomous-system {{ AutonomusSystem }};
+}
+protocols {
+    rsvp {
+        interface ae0;
+        interface ae1;
+        interface lo0.0;
+    }
+    mpls {
+        interface ae0;
+        interface ae1;
+        interface lo0.0;
+    }
+    bgp {
+        group ibgp {
+            type internal;
+            local-address {{ MPLS_Loopback_IP }};
+            family inet-vpn {
+                unicast;
+            }
+            family l2vpn {
+                signaling;
+            }
+            neighbor {{ MPBGP_Peer }};
+        }
+    }
+    ospf {
+        traffic-engineering;
+        export into-ospf;
+        area {{ MPLS_OSPF_AREA }} {
+            stub;
+            interface ae0;
+            interface ae1;
+            interface lo0.0 {
+                passive;
+            }
+          }
+        }
+    ldp {
+        interface ae0;
+        interface ae1;
+        interface lo0.0;
+    }
+}
+policy-options {
+    policy-statement into-ospf {
+        term connected {
+            from protocol direct;
+            then accept;
+        }
+    }
+}
+
+routing-instances {
+    Internet {
+        description Internet;
+        instance-type vrf;
+        interface lo0.10;
+        interface ge-0/0/29.0;
+        route-distinguisher 31370:10;
+        vrf-target target:31370:10;
+        vrf-table-label;
+    }
+    MGMT {
+        description "Mosline MGMT Networks";
+        instance-type vrf;
+        interface lo0.1;
+        interface vlan.20;
+        route-distinguisher 31370:1;
+        vrf-target target:31370:1;
+        vrf-table-label;
+    }                                   
+}
+vlans {
+    MGMT {
+        vlan-id 20;
+        l3-interface vlan.20;
+    }
+    default {
+        l3-interface vlan.0;
+    }
+}

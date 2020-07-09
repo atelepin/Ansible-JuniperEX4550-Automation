@@ -1,0 +1,3 @@
+#PE10-Msk-Rumancevo   ansible_host=10.30.64.10
+[MPLS_PE]
+PE13-Msk-Rumancevo   ansible_host=10.30.64.13 PExx_Msk_Destination=PE1-Msk-M9-6F P2P_Address_1=10.10.66.10/30 MPLS_Loopback_IP=10.10.64.13 MGMT_Loopback_IP=10.30.64.13 Internet_Loopback_IP=10.40.64.13 MGMT_Network=10.30.65.13/24 Internet_Network=10.40.65.13/24 AutonomusSystem=31370 MPBGP_Peer=10.10.0.11 MPLS_OSPF_AREA=0.4.95.64 Location=Rumancevo SMNP_RO_Community=iju09202fee SMNP_RW_Community=HHkk92pmpds0

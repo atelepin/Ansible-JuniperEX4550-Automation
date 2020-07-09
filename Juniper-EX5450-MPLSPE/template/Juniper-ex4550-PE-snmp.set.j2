@@ -1,0 +1,5 @@
+set snmp community {{ SMNP_RO_Community }} authorization read-only
+set snmp community {{ SMNP_RO_Community }} routing-instance MGMT
+set snmp community {{ SMNP_RW_Community }} authorization read-write
+set snmp community {{ SMNP_RW_Community }} routing-instance MGMT
+set snmp routing-instance-access

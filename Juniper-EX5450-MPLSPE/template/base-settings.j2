@@ -1,0 +1,33 @@
+#jinja2: lstrip_blocks: True
+
+system {
+    host-name {{ inventory_hostname }};
+    login {
+        user sean {
+            uid 2000;
+            class super-user;
+            authentication {
+                ssh-rsa "ssh-rsa AAAAB3NzaC1y...vPzOaX3gt8Uv sean@mbp15.local";
+            }
+        }
+    }
+    replace:
+    name-server {
+        {% for server in aja2_host.dns_servers %}
+            {{ server }};
+        {% endfor %}
+    }
+
+    services {
+        delete: ftp;
+        netconf {
+            ssh;
+        }
+        delete: telnet;
+    }
+}
+
+snmp {
+    description "{{ aja2_host.snmp.description }}"
+    location "{{ aja2_host.snmp.location }}"
+}
